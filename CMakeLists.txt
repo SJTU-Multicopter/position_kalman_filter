@@ -129,7 +129,8 @@ include_directories(
 # add_dependencies(position_kalman_filter ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(position_kalman_filter_node src/position_kalman_filter.cpp)
+add_executable(position_kalman_filter src/position_kalman_filter.cpp)
+target_link_libraries(position_kalman_filter ${catkin_LIBRARIES})
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
