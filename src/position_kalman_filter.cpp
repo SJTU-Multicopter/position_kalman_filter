@@ -201,7 +201,7 @@ void position_estimator::kalman_filter(float dt)
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "Kalman filter for position esitmator");
+	ros::init(argc, argv, "KalmanFilterForPositionEsitmator");
 	_P.setIdentity();
 	position_estimator position_estimator;
 	ros::spin();
