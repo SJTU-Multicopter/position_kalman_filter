@@ -173,7 +173,7 @@ void position_estimator::kalman_filter(float dt)
 	matrix::Matrix<float, 4, 4> I;
 	I = So + C * _P * C.transpose();
 	inverse(I);
-	K = _P * C.transpose() * I();
+	K = _P * C.transpose() * I;
 	state = A * state + K * (z - C * A * state);
 
 	_P = A * _P * A.transpose() + Sm;
