@@ -1,4 +1,4 @@
-#include <cmath>
+#include "math.h"
 #include "matrix/Matrix.hpp"
 #include "ros/ros.h"
 #include <geometry_msgs/Pose2D.h>
@@ -21,20 +21,25 @@ robot_pose pose;
 
 matrix::Matrix<float, 5, 5> _P;
 
+
+
 class position_estimator
 {
 public:
 	position_estimator();
-	~position_estimator();
 
 //	bool is_valid() {return _pos_valid;}
 	void get_theta(const robot_pose pose_last2, const robot_pose pose_last, robot_pose pose);
 	void kalman_filter(float dt);
 private:
 	ros::NodeHandle n;
-		ros::Publisher pose_pub;
-		ros::Subscriber pose_sub;
-	void poseCallBack(const geometry_msgs::Pose2D::ConstPtr& pos);
+    ros::Publisher pose_pub;
+    ros::Subscriber pose_sub;
+    std::string frame_id;
+
+    geometry_msgs::Pose2D pose_filtered;
+
+    void poseCallBack(const geometry_msgs::Pose2D::ConstPtr& pos);
 
 	float time;
 	float time_last;
@@ -42,7 +47,8 @@ private:
 
 position_estimator::position_estimator()
 {
-	pose_pub = n.advertise<geometry_msgs::Pose2D>("/pose_filtered", 5);
+    n.param<std::string>("frame_id", frame_id, "position_estimator");
+    pose_pub = n.advertise<geometry_msgs::Pose2D>("/pose_filtered", 5);
 	pose_sub = n.subscribe<geometry_msgs::Pose2D>("/robot_position", 5, &position_estimator::poseCallBack, this);
 }
 
@@ -117,6 +123,8 @@ void position_estimator::get_theta(const robot_pose pose_last2, const robot_pose
 	if (dist < 0.02f)
 	{
 		pose.theta = -1.0f;
+		pose.x = pose_last.x;
+		pose.y = pose_last.y;
 		return;
 	}
 
@@ -174,11 +182,12 @@ void position_estimator::kalman_filter(float dt)
 	I = So + C * _P * C.transpose();
 	inverse(I);
 	K = _P * C.transpose() * I;
+
 	state = A * state + K * (z - C * A * state);
 
 	_P = A * _P * A.transpose() + Sm;
 
-	geometry_msgs::Pose2D pose_filtered;
+
 	pose.x = state(0);
 	pose_filtered.x = state(0);
 	pose.y = state(2);
