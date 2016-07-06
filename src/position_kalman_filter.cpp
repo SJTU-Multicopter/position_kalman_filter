@@ -117,6 +117,8 @@ void position_estimator::get_theta(const robot_pose pose_last2, const robot_pose
 	if (dist < 0.02f)
 	{
 		pose.theta = -1.0f;
+		pose.x = pose_last.x;
+		pose.y = pose_last.y;
 		return;
 	}
 
